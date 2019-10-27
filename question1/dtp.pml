@@ -12,31 +12,25 @@ active [2] proctype P()	{
             y = 1;
             s = _pid;
         }
-        atomic{
-            if // Set want to get into critical section 
-            :: _pid == 0 -> t0 = 1
-            :: _pid == 1 -> t1 = 1
-            fi
-        }
+		if // Set want to get into critical section 
+		:: _pid == 0 -> t0 = 1
+		:: _pid == 1 -> t1 = 1
+		fi
         P[1-_pid]:y == 0 || s != _pid;
-		atomic{
-            if // Set in cs
-            :: _pid == 0 -> c0 = 1
-            :: _pid == 1 -> c1 = 1
-            fi
-            if // Set do not want to enter into cs
-            :: _pid == 0 -> t0 = 0
-            :: _pid == 1 -> t1 = 0
-            fi
-        }
+		if // Set in cs
+		:: _pid == 0 -> c0 = 1
+		:: _pid == 1 -> c1 = 1
+		fi
+		if // Set do not want to enter into cs
+		:: _pid == 0 -> t0 = 0
+		:: _pid == 1 -> t1 = 0
+		fi
         
         /* Critical section */
-        atomic {
-            if // Set not in critical section 
-            :: _pid == 0 -> c0 = 0
-            :: _pid == 1 -> c1 = 0
-            fi
-        }
+		if // Set not in critical section 
+		:: _pid == 0 -> c0 = 0
+		:: _pid == 1 -> c1 = 0
+		fi
         
         y = 0;
 	od;
@@ -61,6 +55,13 @@ active [2] proctype P()	{
 // 	od;
 // }
 ////////////////////////////////
+never  {    /* ([] !(c1 && c0)) Safety G !( c1 ^ c0 ) */
+accept_init:
+T0_init:
+	do
+	:: (! ((c1 && c0))) -> goto T0_init
+	od;
+}
 never  {    /* ([] (t0 -> <>c0))        Liveness for P0     G(t0 -> Fc0 )*/
 T0_init:
 	do
@@ -107,17 +108,10 @@ T0_S27:
 	:: ((c1)) -> goto accept_S27
 	od;
 }
-never  {    /* ([] !(c1 && c0)) Safety G !( c1 ^ c0 ) */
-accept_init:
+never  {    /* ([] <> c0) P0 will occupy its critical section infinitely often G(Fc0 )*/
 T0_init:
 	do
-	:: (! ((c1 && c0))) -> goto T0_init
-	od;
-}
-never  {    /* ([] <> c1)  P1 will occupy its critical section infinitely often G(t1 -> Fc1 )*/
-T0_init:
-	do
-	:: ((c1)) -> goto accept_S9
+	:: ((c0)) -> goto accept_S9
 	:: (1) -> goto T0_init
 	od;
 accept_S9:
@@ -125,10 +119,11 @@ accept_S9:
 	:: (1) -> goto T0_init
 	od;
 }
-never  {    /* ([] <> c0) P0 will occupy its critical section infinitely often G(t0 -> Fc0 )*/
+
+never  {    /* ([] <> c1)  P1 will occupy its critical section infinitely often G(Fc1 )*/
 T0_init:
 	do
-	:: ((c0)) -> goto accept_S9
+	:: ((c1)) -> goto accept_S9
 	:: (1) -> goto T0_init
 	od;
 accept_S9:
