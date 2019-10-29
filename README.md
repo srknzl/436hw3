@@ -50,3 +50,10 @@ iii) True. Starting from we can only go to s1 and s2 alternating. Like this: s2-
 
 iv) True. The ltl formula r v q is true for all states. Thus G(r v q) will be true for all paths.
 
+## Question 3
+
+A and B parts are included as eclipse projects in question3 folder.
+
+Roadrunner outputs are put inside of the each project folder. 
+
+

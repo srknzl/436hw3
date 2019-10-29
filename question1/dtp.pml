@@ -1,3 +1,5 @@
+// Serkan Özel // 2015400123 // serkan.ozel@boun.edu.tr
+//CMPE436-Assignment 3
 bool s = 1;
 bool c1 = 0; // Process 1 in cs
 bool c0 = 0; // Process 0 in cs
